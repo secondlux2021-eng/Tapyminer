@@ -3,108 +3,58 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tapyminer Mini App</title>
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body {
-            margin: 0; padding: 0;
-            background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
-            color: white; font-family: 'Segoe UI', sans-serif;
-            overflow-x: hidden; min-height: 100vh;
-        }
-
-        .stars-container {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
-            background-image: 
-                radial-gradient(1px 1px at 20px 30px, #fff, rgba(0,0,0,0)),
-                radial-gradient(2px 2px at 150px 150px, #00d2ff, rgba(0,0,0,0)),
-                radial-gradient(1.5px 1.5px at 250px 50px, #ff00ff, rgba(0,0,0,0));
-            background-repeat: repeat; background-size: 250px 250px;
-        }
-
-        .container { padding: 20px; text-align: center; }
-
-        .balance-card {
-            background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px);
-            border-radius: 25px; padding: 30px; margin-bottom: 20px;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        .balance-val { font-size: 3rem; font-weight: 800; color: #f39c12; margin: 10px 0; }
-        .currency-name { font-size: 1.2rem; color: #f39c12; opacity: 0.8; }
-
-        .menu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-
-        .menu-item {
-            background: rgba(255, 255, 255, 0.08); border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 15px; padding: 15px; color: white; text-decoration: none;
-            display: flex; flex-direction: column; align-items: center; cursor: pointer;
-        }
-
-        .menu-item:active { transform: scale(0.95); background: rgba(255, 255, 255, 0.15); }
+        body { margin: 0; background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%); color: white; font-family: sans-serif; text-align: center; min-height: 100vh; }
+        .stars { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; background-image: radial-gradient(1px 1px at 20px 30px, #fff, rgba(0,0,0,0)), radial-gradient(1.5px 1.5px at 150px 150px, #00d2ff, rgba(0,0,0,0)); background-size: 200px 200px; }
+        .card { background: rgba(255, 255, 255, 0.05); backdrop-filter: blur(10px); border-radius: 25px; padding: 25px; margin: 20px; border: 1px solid rgba(255, 255, 255, 0.1); }
+        .balance { font-size: 3rem; color: #f39c12; margin: 10px 0; font-weight: bold; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 20px; }
+        .item { background: rgba(255,255,255,0.1); padding: 15px; border-radius: 15px; cursor: pointer; border: 1px solid transparent; }
+        .item:active { transform: scale(0.95); background: rgba(255,255,255,0.2); }
         .main-btn { grid-column: span 2; background: linear-gradient(45deg, #f39c12, #e67e22); color: black; font-weight: bold; }
     </style>
 </head>
 <body>
-    <div class="stars-container"></div>
-    <div class="container">
-        <div class="balance-card">
-            <div style="letter-spacing: 2px; font-size: 0.8rem; opacity: 0.7;">БАЛАНС TAPY</div>
-            <div class="balance-val" id="balance">0.000000</div>
-            <div id="rate-display" style="color: #2ecc71;">⚡ +10.0 Tapy/год</div>
-        </div>
-
-        <div class="menu-grid">
-            <div class="menu-item main-btn" onclick="handleAction('claim')">
-                <span>💰 ЗАБРАТИ TAPY</span>
-            </div>
-            <div class="menu-item" onclick="handleAction('level')"><span>📈 РІВЕНЬ</span></div>
-            <div class="menu-item" onclick="handleAction('riddle')"><span>🧩 ЗАГАДКА</span></div>
-            <div class="menu-item" onclick="handleAction('wheel')"><span>🎡 КОЛЕСО</span></div>
-            <div class="menu-item" onclick="handleAction('tasks')"><span>📝 ЗАВДАННЯ</span></div>
-            <div class="menu-item" onclick="handleAction('shop')"><span>🛒 МАГАЗИН</span></div>
-            <div class="menu-item" onclick="handleAction('friends')"><span>👥 ДРУЗІ</span></div>
-            <div class="menu-item" onclick="handleAction('history')"><span>📜 ІСТОРІЯ</span></div>
-            <div class="menu-item" onclick="handleAction('wallet')"><span>👛 ГАМАНЕЦЬ</span></div>
-            <div class="menu-item" style="grid-column: span 2;" onclick="handleAction('leaderboard')"><span>🏆 ЛІДЕРБОРД</span></div>
-        </div>
+    <div class="stars"></div>
+    <div class="card">
+        <div style="font-size: 0.8rem; opacity: 0.7;">БАЛАНС TAPY</div>
+        <div class="balance" id="balance">0.000000</div>
+        <div style="color: #2ecc71;">⚡ +10.0 Tapy/год</div>
+    </div>
+    <div class="grid">
+        <div class="item main-btn" onclick="sendAction('claim')">💰 ЗАБРАТИ TAPY</div>
+        <div class="item" onclick="sendAction('level')">📈 РІВЕНЬ</div>
+        <div class="item" onclick="sendAction('shop')">🛒 МАГАЗИН</div>
+        <div class="item" onclick="sendAction('tasks')">📝 ЗАВДАННЯ</div>
+        <div class="item" onclick="sendAction('wheel')">🎡 КОЛЕСО</div>
     </div>
 
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
 
-        // Початкові дані (потім будемо брати з бота)
         let currentBalance = 0.0;
-        let miningRate = 10.0; // Tapy за годину
+        let miningRate = 10.0;
 
-        // Функція "Майнінгу" - оновлення цифр
-        function startMining() {
-            const balanceElement = document.getElementById('balance');
-            const increment = miningRate / 3600; // скільки нараховувати за 1 секунду
+        // Майнінг у реальному часі
+        setInterval(() => {
+            currentBalance += miningRate / 3600;
+            document.getElementById('balance').innerText = currentBalance.toFixed(6);
+        }, 1000);
 
-            setInterval(() => {
-                currentBalance += increment;
-                balanceElement.innerText = currentBalance.toFixed(6);
-            }, 1000);
-        }
-
-        // Обробка натискання кнопок
-        function handleAction(type) {
-            tg.HapticFeedback.impactOccurred('light'); // Вібровідгук
+        function sendAction(type) {
+            tg.HapticFeedback.impactOccurred('medium');
             
-            if (type === 'claim') {
-                tg.showAlert(`Ви зібрали намайнені Tapy!`);
-                // Тут можна додати логіку обнулення накопиченого
-            } else {
-                tg.showConfirm(`Відкрити розділ: ${type}?`, (ok) => {
-                    if (ok) tg.close(); // Наприклад, закриваємо додаток, щоб юзер перейшов у чат бота
-                });
-            }
-        }
+            // Створюємо пакет даних для бота
+            let data = {
+                action: type,
+                amount: currentBalance.toFixed(6)
+            };
 
-        window.onload = startMining;
+            // Надсилаємо дані боту і закриваємо вікно для обробки
+            tg.sendData(JSON.stringify(data));
+        }
     </script>
 </body>
 </html>
-                                                                         </html>
