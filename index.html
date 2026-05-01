@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Tapyminer Mini App</title>
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+    <style>
+        body { background: #0f0f0f; color: #fff; font-family: 'Segoe UI', sans-serif; text-align: center; }
+        .stat-card { background: #1e1e1e; border-radius: 20px; padding: 20px; margin: 15px; border: 1px solid #333; }
+        .coin { font-size: 3em; margin: 10px; display: block; animation: float 3s ease-in-out infinite; }
+        @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-10px); } 100% { transform: translateY(0px); } }
+        .btn { background: #f39c12; border: none; padding: 15px 30px; border-radius: 50px; color: #000; font-weight: bold; width: 80%; }
+        .progress-bg { background: #333; border-radius: 10px; height: 10px; margin: 10px 0; }
+        .progress-fill { background: #f39c12; height: 100%; border-radius: 10px; width: 45%; }
+    </style>
+</head>
+<body>
+    <div class="stat-card">
+        <span class="coin">💰</span>
+        <h1 id="balance">0.0000</h1>
+        <p style="color: #2ecc71;">Швидкість: <span id="rate">10</span> м/год</p>
+    </div>
+
+    <div class="stat-card">
+        <p>Рівень <span id="level">1</span></p>
+        <div class="progress-bg"><div class="progress-fill" id="progress"></div></div>
+    </div>
+
+    <button class="btn" onclick="watchAd()">📺 ДИВИТИСЬ РЕКЛАМУ (+БОНУС)</button>
+
+    <script>
+        let tg = window.Telegram.WebApp;
+        tg.expand();
+        
+        // Імітація реального часу для телефону
+        setInterval(() => {
+            let b = document.getElementById('balance');
+            b.innerText = (parseFloat(b.innerText) + 0.0001).toFixed(4);
+        }, 1000);
+
+        function watchAd() {
+            tg.showConfirm("Перейти до рекламного спонсора?", (ok) => {
+                if(ok) window.open("https://monetag.com/your-ad", "_blank");
+            });
+        }
+    </script>
+</body>
+</html>
