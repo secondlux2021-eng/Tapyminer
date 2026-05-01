@@ -5,124 +5,55 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <script src="https://telegram.org/js/telegram-web-app.js"></script>
     <style>
-        body {
-            margin: 0; padding: 0;
-            background: radial-gradient(ellipse at bottom, #1B2735 0%, #090A0F 100%);
-            color: white; font-family: -apple-system, BlinkMacSystemFont, sans-serif;
-            overflow: hidden; height: 100vh;
-        }
-
-        .stars {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1;
-            background-image: radial-gradient(1px 1px at 20px 30px, #fff, rgba(0,0,0,0)), 
-                              radial-gradient(1.2px 1.2px at 100px 100px, #fff, rgba(0,0,0,0));
-            background-size: 200px 200px; opacity: 0.4;
-        }
-
-        /* КОМПАКТНА ВЕРХНЯ ПАНЕЛЬ */
-        .header {
-            display: flex; align-items: center; justify-content: space-between;
-            padding: 10px 15px; background: rgba(255,255,255,0.03); backdrop-filter: blur(5px);
-        }
-
-        .lvl-box {
-            width: 32px; height: 32px; border-radius: 50%;
-            background: rgba(243, 156, 18, 0.2); border: 1px solid #f39c12;
-            color: #f39c12; font-weight: bold; display: flex; align-items: center; justify-content: center; font-size: 14px;
-        }
-
-        .bar-wrap { flex-grow: 1; margin: 0 10px; height: 6px; background: rgba(255,255,255,0.1); border-radius: 3px; }
-        .bar-fill { width: 40%; height: 100%; background: #f39c12; border-radius: 3px; }
-
-        .stats { text-align: right; font-size: 10px; opacity: 0.8; line-height: 1.2; }
-        .stats b { color: #f39c12; }
-
-        /* МАЛИЙ МАЙНЕР */
-        .miner-box {
-            background: rgba(255, 255, 255, 0.03); border-radius: 20px;
-            margin: 15px; padding: 15px; border: 1px solid rgba(255,255,255,0.05);
-        }
-
-        .tapy-num { font-size: 2.2rem; font-weight: 700; color: #f39c12; margin: 5px 0; }
-        .rate-txt { color: #2ecc71; font-size: 12px; }
-
-        /* СКЛЯНІ КНОПКИ */
-        .btn-claim {
-            background: rgba(243, 156, 18, 0.15); color: #f39c12;
-            border: 1px solid rgba(243, 156, 18, 0.3);
-            padding: 12px; border-radius: 12px; width: calc(100% - 30px);
-            margin: 0 15px 15px 15px; font-weight: bold; font-size: 16px;
-        }
-
-        .menu { 
-            display: grid; grid-template-columns: 1fr 1fr; gap: 8px; 
-            padding: 0 15px; overflow-y: auto; max-height: 45vh;
-        }
-
-        .btn-flat {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            border-radius: 12px; padding: 12px; font-size: 12px;
-            color: rgba(255,255,255,0.7); display: flex; align-items: center; justify-content: center;
-        }
-
-        .btn-flat:active, .btn-claim:active { transform: scale(0.97); background: rgba(255,255,255,0.08); }
-        .wide { grid-column: span 2; }
+        body { margin: 0; background: #090A0F; color: white; font-family: sans-serif; text-align: center; }
+        .card { background: rgba(255,255,255,0.05); border-radius: 20px; padding: 20px; margin: 20px; border: 1px solid rgba(255,255,255,0.1); }
+        .val { font-size: 2.5rem; color: #f39c12; font-weight: bold; margin: 10px 0; }
+        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 15px; }
+        .btn { background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); padding: 15px; border-radius: 12px; cursor: pointer; color: #ccc; }
+        .main { background: rgba(243, 156, 18, 0.2); color: #f39c12; border: 1px solid #f39c12; font-weight: bold; margin-bottom: 15px; width: calc(100% - 30px); margin-left: 15px; }
     </style>
 </head>
 <body>
-    <div class="stars"></div>
-
-    <div class="header">
-        <div class="lvl-box">1</div>
-        <div class="bar-wrap"><div class="bar-fill"></div></div>
-        <div class="stats">
-            <div>TON: <b>0.00</b></div>
-            <div>STARS: <b>0</b></div>
-            <div>TAPY: <b>125.5</b></div>
-        </div>
+    <div class="card">
+        <div style="font-size: 0.7rem; opacity: 0.6;">БАЛАНС TAPY</div>
+        <div class="val" id="display">0.000000</div>
     </div>
 
-    <div class="miner-box">
-        <div style="font-size: 10px; opacity: 0.5; letter-spacing: 1px;">БАЛАНС TAPY</div>
-        <div class="tapy-num" id="val">0.000000</div>
-        <div class="rate-txt">⚡ +10.0 Tapy/год</div>
-    </div>
+    <button class="btn main" onclick="sendToBot('claim')">💰 ЗАБРАТИ TAPY</button>
 
-    <button class="btn-claim" onclick="act('claim')">💰 ЗАБРАТИ TAPY</button>
-
-    <div class="menu">
-        <div class="btn-flat" onclick="act('level')">РІВЕНЬ</div>
-        <div class="btn-flat" onclick="act('shop')">МАГАЗИН</div>
-        <div class="btn-flat" onclick="act('tasks')">ЗАВДАННЯ</div>
-        <div class="btn-flat" onclick="act('wheel')">КОЛЕСО</div>
-        <div class="btn-flat" onclick="act('riddle')">ЗАГАДКА</div>
-        <div class="btn-flat" onclick="act('friends')">ДРУЗІ</div>
-        <div class="btn-flat" onclick="act('history')">ІСТОРІЯ</div>
-        <div class="btn-flat" onclick="act('wallet')">ГАМАНЕЦЬ</div>
-        <div class="btn-flat wide" onclick="act('leaderboard')">🏆 ЛІДЕРБОРД</div>
+    <div class="grid">
+        <div class="btn" onclick="sendToBot('level')">РІВЕНЬ</div>
+        <div class="btn" onclick="sendToBot('shop')">МАГАЗИН</div>
+        <div class="btn" onclick="sendToBot('tasks')">ЗАВДАННЯ</div>
+        <div class="btn" onclick="sendToBot('wheel')">КОЛЕСО</div>
     </div>
 
     <script>
         let tg = window.Telegram.WebApp;
         tg.expand();
-        tg.ready();
+        tg.ready(); // Повідомляємо Telegram, що ми готові
 
-        let count = 0.0;
-        let r = 10.0;
-
-        // Майнінг
+        let current = 0.0;
         setInterval(() => {
-            count += r / 3600;
-            document.getElementById('val').innerText = count.toFixed(6);
+            current += 10.0 / 3600;
+            document.getElementById('display').innerText = current.toFixed(6);
         }, 1000);
 
-        function act(type) {
-            tg.HapticFeedback.impactOccurred('light');
-            let res = JSON.stringify({action: type, amount: count.toFixed(6)});
-            
-            // Відправка даних боту
-            tg.sendData(res);
+        function sendToBot(actionName) {
+            try {
+                tg.HapticFeedback.impactOccurred('medium');
+                
+                let payload = JSON.stringify({
+                    action: actionName,
+                    amount: current.toFixed(6)
+                });
+
+                // ОСНОВНА КОМАНДА
+                tg.sendData(payload);
+                
+            } catch (e) {
+                alert("Помилка відправки: " + e);
+            }
         }
     </script>
 </body>
